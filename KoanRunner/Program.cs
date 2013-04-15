@@ -17,37 +17,52 @@ namespace DotNetKoans.KoanRunner
                 Console.WriteLine("");
                 Console.WriteLine("*******************************************************************");
                 Console.WriteLine("*******************************************************************");
-                string koan_path = args[0];
-                Xunit.ExecutorWrapper wrapper = new ExecutorWrapper(koan_path, null, false);
-                System.Reflection.Assembly koans = System.Reflection.Assembly.LoadFrom(koan_path);
-                if (koans == null) { Console.WriteLine("Bad Assembly"); return -1; }
-                Type pathType = null;
-                foreach (Type type in koans.GetExportedTypes())
+                if (args.Length == 0)
                 {
-                    if (typeof(KoanHelpers.IAmThePathToEnlightenment).IsAssignableFrom(type))
-                    {
-                        pathType = type;
-                        break;
-                    }
+
+                    Console.WriteLine("Need to pass as argument the path to test DLL (CSharp.dll)");
+                    return TEST_FAILED;
                 }
-
-                KoanHelpers.IAmThePathToEnlightenment path = Activator.CreateInstance(pathType) as KoanHelpers.IAmThePathToEnlightenment;
-                string[] thePath = path.ThePath;
-
-                foreach (string koan in thePath)
+                else
                 {
-                    Run(koan, koans, wrapper);
+
+                    string koan_path = args[0];
+                    Xunit.ExecutorWrapper wrapper = new ExecutorWrapper(koan_path, null, false);
+                    System.Reflection.Assembly koans = System.Reflection.Assembly.LoadFrom(koan_path);
+                    if (koans == null) { Console.WriteLine("Bad Assembly"); return -1; }
+                    Type pathType = null;
+                    foreach (Type type in koans.GetExportedTypes())
+                    {
+                        if (typeof(KoanHelpers.IAmThePathToEnlightenment).IsAssignableFrom(type))
+                        {
+                            pathType = type;
+                            break;
+                        }
+                    }
+
+                    KoanHelpers.IAmThePathToEnlightenment path = Activator.CreateInstance(pathType) as KoanHelpers.IAmThePathToEnlightenment;
+                    string[] thePath = path.ThePath;
+
+                    foreach (string koan in thePath)
+                    {
+                        Run(koan, koans, wrapper);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Karma has killed the runner. Exception was: " + ex.ToString());
-                return -1;
+                //return -1;
+                return TEST_FAILED;
             }
             Console.WriteLine("*******************************************************************");
             Console.WriteLine("*******************************************************************");
             Console.WriteLine("");
             Console.WriteLine("");
+            // Add prompt so you can view the console results
+            Console.WriteLine("Press <Enter> to continue, because \"like gravity, karma is so basic");
+            Console.WriteLine("we often don't even notice it.\" - Sakyong Mipham");
+            Console.ReadLine();
             return TEST_FAILED;
         }
 
